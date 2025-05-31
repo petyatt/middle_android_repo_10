@@ -1,26 +1,34 @@
 package ru.yandex.buggyweatherapp
 
 import android.app.Application
-import android.content.Context
-import ru.yandex.buggyweatherapp.utils.ImageLoader
-import ru.yandex.buggyweatherapp.utils.LocationTracker
+import coil.ImageLoaderFactory
+import coil.disk.DiskCache
+import coil.memory.MemoryCache
+import coil.request.CachePolicy
+import dagger.hilt.android.HiltAndroidApp
 
-class WeatherApplication : Application() {
-    
-    
-    companion object {
-        lateinit var appContext: Context
-            private set
-    }
-    
+@HiltAndroidApp
+class WeatherApplication : Application(), ImageLoaderFactory {
+
     override fun onCreate() {
         super.onCreate()
-        
-        
-        appContext = this
-        
-        
-        ImageLoader.initialize(this)
-        LocationTracker.getInstance(this)
+    }
+    override fun newImageLoader(): coil.ImageLoader {
+        return coil.ImageLoader.Builder(this)
+            .memoryCache {
+                MemoryCache.Builder(this)
+                    .maxSizePercent(0.25)
+                    .build()
+            }
+            .diskCache {
+                DiskCache.Builder()
+                    .directory(this.cacheDir.resolve("image_cache"))
+                    .maxSizePercent(0.02)
+                    .build()
+            }
+            .respectCacheHeaders(false)
+            .memoryCachePolicy(CachePolicy.ENABLED)
+            .diskCachePolicy(CachePolicy.ENABLED)
+            .build()
     }
 }
