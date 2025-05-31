@@ -10,14 +10,14 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
+import dagger.hilt.android.qualifiers.ApplicationContext
 import ru.yandex.buggyweatherapp.model.Location
-import ru.yandex.buggyweatherapp.utils.LocationTracker
 import java.util.Locale
+import javax.inject.Inject
 
-class LocationRepository(
-    
-    private val context: Context
-) {
+class LocationRepository @Inject constructor(
+    @ApplicationContext private val context: Context
+) : ILocationRepository {
     
     private val fusedLocationClient: FusedLocationProviderClient = 
         LocationServices.getFusedLocationProviderClient(context)
@@ -29,7 +29,7 @@ class LocationRepository(
     private var locationCallback: ((Location?) -> Unit)? = null
     
     
-    fun getCurrentLocation(callback: (Location?) -> Unit) {
+    override fun getCurrentLocation(callback: (Location?) -> Unit) {
         try {
             locationCallback = callback
             
@@ -94,7 +94,7 @@ class LocationRepository(
     }
     
     
-    fun getCityNameFromLocation(location: Location): String? {
+    override fun getCityNameFromLocation(location: Location): String? {
         try {
             
             val geocoder = Geocoder(context, Locale.getDefault())
@@ -119,11 +119,11 @@ class LocationRepository(
             return null
         }
     }
-    
-    
-    fun startLocationTracking() {
-        LocationTracker.getInstance(context).startTracking()
+
+
+    override fun startLocationTracking() {
+
     }
-    
-    
+
+
 }

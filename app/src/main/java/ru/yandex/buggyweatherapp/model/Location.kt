@@ -21,4 +21,8 @@ data class Location(
         if (other !is Location) return false
         return latitude == other.latitude && longitude == other.longitude
     }
+
+    override fun hashCode(): Int {
+        return javaClass.hashCode()
+    }
 }
